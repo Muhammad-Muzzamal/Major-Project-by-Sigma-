@@ -3,11 +3,13 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 const Listing = require("./models/listings.model");
 const path = require("path");
+const methodOverride = require("method-override");
 
 const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
@@ -37,6 +39,40 @@ app.get("/listings/:id", async (req, res) => {
   let { id } = req.params;
   const listing = await Listing.findById(id);
   return res.render("listings/show.ejs", { listing });
+});
+
+// Show route
+app.get("/listing/new", (req, res) => {
+  res.render("listings/new.ejs");
+});
+
+// Create Listing route
+app.post("/listings", async (req, res) => {
+  const { title, description, location, image, price } = req.body;
+  let listData = { title, description, location, image, price };
+  await Listing.insertOne(listData);
+  res.redirect("/listings");
+});
+
+// Show Edit Form Route
+app.get("/listings/:id/edit", async (req, res) => {
+  const { id } = req.params;
+  const listing = await Listing.findById(id);
+  res.render("listings/edit.ejs", { listing });
+});
+// Edit Listing
+app.post("/listings/:id", async (req, res) => {
+  const { id } = req.params;
+  const { title, description, location, price, image } = req.body;
+  const listData = { title, description, location, price, image };
+  await Listing.findByIdAndUpdate(id, listData);
+  res.redirect("/listings");
+});
+// Delete Listing
+app.delete("/listings/:id/delete", async (req, res) => {
+  const { id } = req.params;
+  await Listing.findByIdAndDelete(id);
+  res.redirect("/listings");
 });
 
 // app.get("/testListing", async (req, res) => {
