@@ -1,0 +1,55 @@
+/* Body */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-top: 4rem;
+  font-family: "Poppins", sans-serif;
+}
+.container {
+  flex: 1;
+}
+
+/* Nav Bar */
+.navbar {
+  background: white;
+  color: #222 !important;
+}
+.fa-compass {
+  color: red;
+  font-size: 2rem;
+}
+/* Footer */
+footer {
+  background: #f7f7f7;
+  gap: 10px;
+}
+.term-and-condition-div a:hover {
+  text-decoration: underline !important;
+}
+
+/* Card */
+.card-img-top {
+  border-radius: 1rem;
+}
+.card {
+  border: none;
+}
+.card-body {
+  padding: 0px !important;
+  margin: 0px !important;
+}
+.card-link-show {
+  text-decoration: none !important;
+  color: black;
+}
+.card-link-show:hover {
+  color: #000;
+}
+.card-img-overlay {
+  opacity: 0;
+}
+.card-img-overlay:hover {
+  opacity: 0.2;
+  background-color: white;
+}
