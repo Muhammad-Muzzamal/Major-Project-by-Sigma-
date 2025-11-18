@@ -5,6 +5,7 @@ const Listing = require("./models/listings.model");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const wrapAsync = require("./utils/wrapAsync");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -48,12 +49,15 @@ app.get("/listings/:id", async (req, res) => {
   return res.render("listings/show.ejs", { listing });
 });
 // Create Listing route
-app.post("/listings", async (req, res) => {
-  const { title, description, location, image, price } = req.body;
-  let listData = { title, description, location, image, price };
-  await Listing.insertOne(listData);
-  res.redirect("/listings");
-});
+app.post(
+  "/listings",
+  wrapAsync(async (req, res) => {
+    const { title, description, location, image, price } = req.body;
+    let listData = { title, description, location, image, price };
+    await Listing.insertOne(listData);
+    res.redirect("/listings");
+  })
+);
 
 // Show Edit Form Route
 app.get("/listings/:id/edit", async (req, res) => {
@@ -63,11 +67,15 @@ app.get("/listings/:id/edit", async (req, res) => {
 });
 // Edit Listing
 app.post("/listings/:id", async (req, res) => {
-  const { id } = req.params;
-  const { title, description, location, price, image } = req.body;
-  const listData = { title, description, location, price, image };
-  await Listing.findByIdAndUpdate(id, listData);
-  res.redirect("/listings");
+  try {
+    const { id } = req.params;
+    const { title, description, location, price, image } = req.body;
+    const listData = { title, description, location, price, image };
+    await Listing.findByIdAndUpdate(id, listData);
+    res.redirect("/listings");
+  } catch (err) {
+    next(err);
+  }
 });
 // Delete Listing
 app.delete("/listings/:id/delete", async (req, res) => {
@@ -76,18 +84,10 @@ app.delete("/listings/:id/delete", async (req, res) => {
   res.redirect("/listings");
 });
 
-// app.get("/testListing", async (req, res) => {
-//   let sampleListing = new Listing({
-//     title: "test Title",
-//     description: "text description",
-//     price: 1200,
-//     location: "Karachi",
-//     country: "Pakistan",
-//   });
-//   await sampleListing.save();
-//   console.log("Sample Listign was saved");
-//   res.send("successfull");
-// });
+// Error Handling middleware
+app.use((er, req, res, next) => {
+  res.send("Something went wrong");
+});
 
 app.listen(8080, () => {
   console.log(`App is listen on http://localhost:8080`);

@@ -3,7 +3,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  margin-top: 4rem;
+  margin-top: 5rem;
   font-family: "Poppins", sans-serif;
 }
 .container {
