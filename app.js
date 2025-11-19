@@ -6,6 +6,7 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync");
+const ExpressError = require("./utils/ExpressError.js");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -34,20 +35,26 @@ app.get("/", (req, res) => {
 });
 
 // index route
-app.get("/listings", async (req, res) => {
-  const allListing = await Listing.find({});
-  return res.render("listings/index.ejs", { allListing });
-});
+app.get(
+  "/listings",
+  wrapAsync(async (req, res) => {
+    const allListing = await Listing.find({});
+    return res.render("listings/index.ejs", { allListing });
+  })
+);
 // Show route
 app.get("/listings/new", (req, res) => {
   res.render("listings/new.ejs");
 });
 // Show route
-app.get("/listings/:id", async (req, res) => {
-  let { id } = req.params;
-  const listing = await Listing.findById(id);
-  return res.render("listings/show.ejs", { listing });
-});
+app.get(
+  "/listings/:id",
+  wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    const listing = await Listing.findById(id);
+    return res.render("listings/show.ejs", { listing });
+  })
+);
 // Create Listing route
 app.post(
   "/listings",
@@ -60,33 +67,49 @@ app.post(
 );
 
 // Show Edit Form Route
-app.get("/listings/:id/edit", async (req, res) => {
-  const { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listings/edit.ejs", { listing });
-});
-// Edit Listing
-app.post("/listings/:id", async (req, res) => {
-  try {
+app.get(
+  "/listings/:id/edit",
+  wrapAsync(async (req, res) => {
     const { id } = req.params;
-    const { title, description, location, price, image } = req.body;
-    const listData = { title, description, location, price, image };
-    await Listing.findByIdAndUpdate(id, listData);
-    res.redirect("/listings");
-  } catch (err) {
-    next(err);
-  }
-});
+    const listing = await Listing.findById(id);
+    res.render("listings/edit.ejs", { listing });
+  })
+);
+// Edit Listing
+app.post(
+  "/listings/:id",
+  wrapAsync(async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { title, description, location, price, image } = req.body;
+      const listData = { title, description, location, price, image };
+      await Listing.findByIdAndUpdate(id, listData);
+      res.redirect("/listings");
+    } catch (err) {
+      next(err);
+    }
+  })
+);
 // Delete Listing
-app.delete("/listings/:id/delete", async (req, res) => {
-  const { id } = req.params;
-  await Listing.findByIdAndDelete(id);
-  res.redirect("/listings");
+app.delete(
+  "/listings/:id/delete",
+  wrapAsync(async (req, res) => {
+    const { id } = req.params;
+    await Listing.findByIdAndDelete(id);
+    res.redirect("/listings");
+  })
+);
+
+// If no route is found from above then this is called for 404
+app.all("*", (req, res, next) => {
+  next(new ExpressError(404, "Page is not found"));
 });
 
 // Error Handling middleware
 app.use((er, req, res, next) => {
-  res.send("Something went wrong");
+  let { statusCode, message } = err;
+
+  res.status(statusCode).send(message);
 });
 
 app.listen(8080, () => {
