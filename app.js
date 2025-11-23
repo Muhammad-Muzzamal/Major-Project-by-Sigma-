@@ -59,6 +59,9 @@ app.get(
 app.post(
   "/listings",
   wrapAsync(async (req, res) => {
+    if (!req.body.listings) {
+      throw new ExpressError(400, "Send valid data for listing");
+    }
     const { title, description, location, image, price } = req.body;
     let listData = { title, description, location, image, price };
     await Listing.insertOne(listData);
@@ -101,15 +104,16 @@ app.delete(
 );
 
 // If no route is found from above then this is called for 404
-app.all("*", (req, res, next) => {
-  next(new ExpressError(404, "Page is not found"));
-});
+// app.all("*", (req, res, next) => {
+//   next(new ExpressError(404, "Page is not found"));
+// });
 
 // Error Handling middleware
-app.use((er, req, res, next) => {
-  let { statusCode, message } = err;
+app.use((err, req, res, next) => {
+  let { statusCode = 500, message } = err;
 
-  res.status(statusCode).send(message);
+  // res.status(statusCode).send(message);
+  res.render("error.ejs", { err });
 });
 
 app.listen(8080, () => {
