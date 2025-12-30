@@ -59,9 +59,11 @@ app.get(
 app.post(
   "/listings",
   wrapAsync(async (req, res) => {
-    if (!req.body.listings) {
-      throw new ExpressError(400, "Send valid data for listing");
-    }
+    console.log(req.body);
+    // if (!req.body.listings) {
+    //   console.log(req.body);
+    //   throw new ExpressError(400, "Send valid data for listing");
+    // }
     const { title, description, location, image, price } = req.body;
     let listData = { title, description, location, image, price };
     await Listing.insertOne(listData);
