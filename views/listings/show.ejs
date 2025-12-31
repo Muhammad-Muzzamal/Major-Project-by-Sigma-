@@ -1,7 +1,7 @@
 <% layout("layout/boilerplate.ejs") %>
 <body>
   <h3 class="text-center mb-3"><%= listing.title %></h3>
-  <div class="card w-50 offset-3 mb-5" style="width: 18rem">
+  <div class="card w-50 offset-3 mb-5 listing-card" style="width: 18rem">
     <img src="<%= listing.image%>" class="card-img-top" alt="..." />
     <div class="card-body">
       <p class="card-text">
@@ -19,6 +19,47 @@
         >
           <button class="btn btn-danger">Delete</button>
         </form>
+      </div>
+      <div>
+        <hr>
+        <h4 class="mb-3">Leave a Review</h4>
+        <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation">
+          <div class="mb-3">
+            <label for="rating">Rating</label>
+            <input type="range" name="review[rating]" id="rating" min="1" max="5">
+          </div>
+          <div class="mb-3">
+            <label for="comment" class="form-label">Comments</label>
+            <textarea name="review[comment]" id="comment"
+            rows="5"
+            cols="30"
+            class="form-control"
+            required
+            ></textarea>
+            <div class="invalid-feedback">Please submit some comment for review</div>
+          </div>
+          <button class="btn btn-dark">Submit</button>
+        </form>
+
+        <div class="mt-4">
+          <h4>All reviews</h4>
+          <div class="row">
+            <% for(review of listing.reviews) { %>
+              <div class="card col-5 mb-3 ms-3">
+                <div class="card-body">
+                  <h5 class="card-title">Muzzamal</h5>
+                  <div class="card-text"><%= review.comment %></div>
+                  <div class="card-text"><%= review.rating %> star</div>
+                </div>
+                <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>" class="mb-2" method="POST">
+                  <button class="btn btn-sm btn-dark">Delete</button>
+                </form>
+              </div>
+            <% } %> 
+          </div>
+          
+        </div>
+
       </div>
     </div>
   </div>

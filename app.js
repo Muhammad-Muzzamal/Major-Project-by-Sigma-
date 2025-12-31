@@ -1,12 +1,14 @@
 const express = require("express");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const Listing = require("./models/listings.model");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const wrapAsync = require("./utils/wrapAsync");
 const ExpressError = require("./utils/ExpressError.js");
+const ListingRoutes = require("./routes/listing.route.js");
+const ReviewRoutes = require("./routes/review.route.js");
+const cookieParser = require("cookie-parser");
+
 
 const app = express();
 app.set("view engine", "ejs");
@@ -15,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
+app.use(cookieParser());
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
@@ -34,76 +37,8 @@ app.get("/", (req, res) => {
   res.send("Hi, I am root");
 });
 
-// index route
-app.get(
-  "/listings",
-  wrapAsync(async (req, res) => {
-    const allListing = await Listing.find({});
-    return res.render("listings/index.ejs", { allListing });
-  })
-);
-// Show route
-app.get("/listings/new", (req, res) => {
-  res.render("listings/new.ejs");
-});
-// Show route
-app.get(
-  "/listings/:id",
-  wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    const listing = await Listing.findById(id);
-    return res.render("listings/show.ejs", { listing });
-  })
-);
-// Create Listing route
-app.post(
-  "/listings",
-  wrapAsync(async (req, res) => {
-    console.log(req.body);
-    // if (!req.body.listings) {
-    //   console.log(req.body);
-    //   throw new ExpressError(400, "Send valid data for listing");
-    // }
-    const { title, description, location, image, price } = req.body;
-    let listData = { title, description, location, image, price };
-    await Listing.insertOne(listData);
-    res.redirect("/listings");
-  })
-);
-
-// Show Edit Form Route
-app.get(
-  "/listings/:id/edit",
-  wrapAsync(async (req, res) => {
-    const { id } = req.params;
-    const listing = await Listing.findById(id);
-    res.render("listings/edit.ejs", { listing });
-  })
-);
-// Edit Listing
-app.post(
-  "/listings/:id",
-  wrapAsync(async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { title, description, location, price, image } = req.body;
-      const listData = { title, description, location, price, image };
-      await Listing.findByIdAndUpdate(id, listData);
-      res.redirect("/listings");
-    } catch (err) {
-      next(err);
-    }
-  })
-);
-// Delete Listing
-app.delete(
-  "/listings/:id/delete",
-  wrapAsync(async (req, res) => {
-    const { id } = req.params;
-    await Listing.findByIdAndDelete(id);
-    res.redirect("/listings");
-  })
-);
+app.use("/listings", ListingRoutes);
+app.use("/listings/:id/reviews", ReviewRoutes);
 
 // If no route is found from above then this is called for 404
 // app.all("*", (req, res, next) => {
