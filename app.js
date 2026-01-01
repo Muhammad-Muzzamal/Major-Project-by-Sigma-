@@ -8,7 +8,7 @@ const ExpressError = require("./utils/ExpressError.js");
 const ListingRoutes = require("./routes/listing.route.js");
 const ReviewRoutes = require("./routes/review.route.js");
 const cookieParser = require("cookie-parser");
-
+const session = require("express-session");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -18,6 +18,14 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(cookieParser());
+
+const sessionOptions = {
+  secret: "secret",
+  resave: false,
+  saveUninitialized: true,
+};
+
+app.use(session(sessionOptions));
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
