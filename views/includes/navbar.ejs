@@ -1,5 +1,7 @@
 <nav class="navbar navbar-expand-sm fixed-top border-bottom">
-  <a class="navbar-brand" href="#"><i class="fa-solid fa-compass"></i></a>
+  <a class="navbar-brand text-danger" href="#"
+    ><i class="fa-solid fa-compass"></i
+  ></a>
   <button
     class="d-md-none"
     type="button"
@@ -13,7 +15,6 @@
   </button>
   <div class="collapse navbar-collapse" id="collapsibleNavId">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-
       <li class="nav-item">
         <a class="nav-link text-dark" href="/">Home</a>
       </li>
@@ -23,6 +24,29 @@
       <li class="nav-item">
         <a class="nav-link text-dark" href="/listings/new">New Listings</a>
       </li>
+    </ul>
+  </div>
+  <div class="collapse navbar-collapse" id="collapsibleNavId">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      <%if (!currUser) { %>
+
+      <li class="nav-item">
+        <a
+          class="nav-link text-danger btn btn-outline-danger mb-1"
+          href="/signup"
+          >Signup</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark btn btn-danger mb-1" href="/login"
+          >Login</a
+        >
+      </li>
+      <% } %> <% if (currUser) { %>
+      <li class="nav-item">
+        <a class="nav-link btn btn-dark" href="/logout">Logout</a>
+      </li>
+      <%} %>
     </ul>
   </div>
 </nav>
