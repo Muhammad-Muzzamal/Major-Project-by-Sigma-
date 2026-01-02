@@ -10,6 +10,10 @@ const ReviewRoutes = require("./routes/review.route.js");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const user = require("./models/user.model.js");
+const UserRoutes = require("./routes/user.route.js");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -33,6 +37,12 @@ const sessionOptions = {
 };
 
 app.use(session(sessionOptions));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(user.authenticate()));
+
+passport.serializeUser(user.serializeUser());
+passport.deserializeUser(user.deserializeUser());
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
@@ -60,6 +70,7 @@ app.use((req, res, next) => {
 
 app.use("/listings", ListingRoutes);
 app.use("/listings/:id/reviews", ReviewRoutes);
+app.use("/", UserRoutes);
 
 // If no route is found from above then this is called for 404
 // app.all("*", (req, res, next) => {
