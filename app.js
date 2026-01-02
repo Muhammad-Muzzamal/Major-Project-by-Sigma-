@@ -9,6 +9,7 @@ const ListingRoutes = require("./routes/listing.route.js");
 const ReviewRoutes = require("./routes/review.route.js");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const flash = require("connect-flash");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -18,11 +19,17 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(cookieParser());
+app.use(flash());
 
 const sessionOptions = {
   secret: "secret",
   resave: false,
   saveUninitialized: true,
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
 };
 
 app.use(session(sessionOptions));
@@ -43,6 +50,12 @@ async function main() {
 
 app.get("/", (req, res) => {
   res.send("Hi, I am root");
+});
+
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
 });
 
 app.use("/listings", ListingRoutes);
