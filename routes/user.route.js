@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/user.model.js");
 const wrapAsync = require("../utils/wrapAsync");
 const passport = require("passport");
+const { saveRedirectUrl } = require("../middleware.js");
 
 router.get("/signup", (req, res) => {
   res.render("users/signup.ejs");
@@ -32,6 +33,7 @@ router.get("/login", (req, res) => {
 });
 router.post(
   "/login",
+  saveRedirectUrl,
   passport.authenticate("local", {
     failureRedirect: "/login",
     failureFlash: true,
@@ -39,7 +41,7 @@ router.post(
   async (req, res) => {
     console.log("i am from user login");
     req.flash("success", "Welcome to WonderLust");
-    res.redirect("/listings");
+    res.redirect(res.locals.redirectUrl || "/listings");
   }
 );
 router.get("/logout", (req, res) => {

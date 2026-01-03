@@ -5,12 +5,20 @@
     <img src="<%= listing.image%>" class="card-img-top" alt="..." />
     <div class="card-body">
       <p class="card-text">
-        <!-- <div><b></b></div> -->
+        <p>
+          <i><%= listing.owner.email %></i>
+        </p>
+        <p>
+
+        
         <div><%= listing.description %></div>
         <div>Rs. : <%= listing.price.toLocaleString("en-PK") %></div>
         <div><%= listing.location %></div>
         <div><%= listing.country %></div>
+        </p>
       </p>
+      <% console.log(currUser) %>
+      <% if( currUser && currUser._id.equals(listing.owner._id)) { %>
       <div class="d-flex flex-row justify-content-between">
         <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark px-4">Edit</a>
         <form
@@ -20,6 +28,7 @@
           <button class="btn btn-danger">Delete</button>
         </form>
       </div>
+      <% } %>
       <div>
         <hr>
         <h4 class="mb-3">Leave a Review</h4>
