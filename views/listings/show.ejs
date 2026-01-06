@@ -6,7 +6,7 @@
     <div class="card-body">
       <p class="card-text">
         <p>
-          <i><%= listing.owner.email %></i>
+          <i><%= listing.owner.username %></i>
         </p>
         <p>
 
@@ -17,7 +17,6 @@
         <div><%= listing.country %></div>
         </p>
       </p>
-      <% console.log(currUser) %>
       <% if( currUser && currUser._id.equals(listing.owner._id)) { %>
       <div class="d-flex flex-row justify-content-between">
         <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark px-4">Edit</a>
@@ -31,6 +30,9 @@
       <% } %>
       <div>
         <hr>
+        <% if (currUser) { %>
+          
+        
         <h4 class="mb-3">Leave a Review</h4>
         <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation">
           <div class="mb-3">
@@ -49,20 +51,22 @@
           </div>
           <button class="btn btn-dark">Submit</button>
         </form>
-
+        <% } %>
         <div class="mt-4">
           <h4>All reviews</h4>
           <div class="row">
             <% for(review of listing.reviews) { %>
               <div class="card col-5 mb-3 ms-3">
                 <div class="card-body">
-                  <h5 class="card-title">Muzzamal</h5>
+                  <h5 class="card-title"><% review.author.email %></h5>
                   <div class="card-text"><%= review.comment %></div>
                   <div class="card-text"><%= review.rating %> star</div>
                 </div>
+                <% if( currUser && review.author._id.equals(currUser._id) ) {%>
                 <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>" class="mb-2" method="POST">
                   <button class="btn btn-sm btn-dark">Delete</button>
                 </form>
+                <% } %>
               </div>
             <% } %> 
           </div>
