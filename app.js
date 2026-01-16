@@ -63,7 +63,6 @@ async function main() {
 app.get("/", (req, res) => {
   res.send("Hi, I am root");
 });
-
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
